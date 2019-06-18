@@ -9,9 +9,15 @@ type Database interface {
 }
 
 type SelectQuery interface {
+	Int64() (int64, error)
+	Int() (int, error)
+	Scan(v []interface{}, err error)
 }
 
 type SelectOneQuery interface {
+	Int64() (int64, error)
+	Int() (int, error)
+	Scan(v interface{}, err error)
 }
 
 type UpdateQuery interface {
