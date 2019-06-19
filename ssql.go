@@ -20,10 +20,10 @@ func (db *DB) Select(query string, args ...interface{}) *SelectResult {
 	return &SelectResult{rows, err}
 }
 
-func (db *DB) SelectOne(query string, args ...interface{}) *SelectOneResult {
-	row := db.rdb.QueryRow(query, args...)
-	return &SelectOneResult{row}
-}
+//func (db *DB) SelectOne(query string, args ...interface{}) *SelectOneResult {
+//	row := db.rdb.QueryRow(query, args...)
+//	return &SelectOneResult{row}
+//}
 
 func (db *DB) Update(query string, args ...interface{}) {
 	panic("implement me")

@@ -1,5 +1,9 @@
 package ssql
 
+import (
+	"log"
+)
+
 //func TestName(t *testing.T) {
 //	db, err := sql.Open("sqlite3", "/tmp/post_db.bin")
 //	checkErr(err, "sql.Open failed")
@@ -8,9 +12,9 @@ package ssql
 //	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
 //	dbmap.Select()
 //}
-//
-//func checkErr(err error, msg string) {
-//	if err != nil {
-//		log.Fatalln(msg, err)
-//	}
-//}
+
+func checkErr(err error, msg string) {
+	if err != nil {
+		log.Fatalln(msg, err)
+	}
+}

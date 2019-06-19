@@ -2,11 +2,19 @@ package ssql
 
 import (
 	"database/sql"
-	"reflect"
+	"log"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 )
+
+func getDB() *DB {
+	db, err := Open("mysql", "root@tcp(localhost:3306)/devnews?parseTime=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
 
 func query() (*sql.Rows, error) {
 	db, err := sql.Open("mysql", "root@tcp(localhost:3306)/devnews?parseTime=true")
@@ -15,6 +23,22 @@ func query() (*sql.Rows, error) {
 	}
 
 	return db.Query(`select title, item_id from items`)
+}
+
+func TestCount(t *testing.T) {
+	db := getDB()
+	v, err := db.Select("select count(*) from items where title=?", "Hello").Int()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(v)
+
+	var items []item
+	err = db.Select("select * from items").Values(&items)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(items)
 }
 
 type item struct {
@@ -45,27 +69,4 @@ func TestScanStructSlice(t *testing.T) {
 
 	t.Logf("%v", items)
 	//t.Log(it.ItemID, it.Title)
-}
-
-func TestAA(t *testing.T) {
-	var items []*item
-	typ := reflect.TypeOf(items)
-	t.Log(typ.Kind().String(), typ.String())
-	t.Log(typ.Elem().Kind().String(), typ.Elem().String())
-	t.Log(typ.Elem().Elem().Kind().String())
-	t.Log(typ.Elem().Elem().FieldByName("Title"))
-
-	et := typ.Elem()
-	if et.Kind() == reflect.Ptr {
-		et = et.Elem()
-	}
-	t.Log(et.Kind().String())
-
-	n := reflect.New(et)
-	t.Log(n.Elem().String())
-	n.Elem().FieldByName("Title").SetString("Hello")
-	t.Logf("%v", n.Interface())
-
-	//v := reflect.ValueOf(items)
-	//t.Log(v.Kind().String())
 }
