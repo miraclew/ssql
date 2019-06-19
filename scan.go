@@ -36,10 +36,14 @@ func scanStruct(rows *sql.Rows, dest interface{}) error {
 
 func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 	t := reflect.TypeOf(dest)
-	if t.Kind() != reflect.Slice {
+	if t.Kind() != reflect.Ptr {
+		return errors.New("dest must be a slice pointer")
+	}
+
+	if t = t.Elem(); t.Kind() != reflect.Slice {
 		return errors.New("dest must be a slice")
 	}
-	v := reflect.ValueOf(dest)
+	v := reflect.Indirect(reflect.ValueOf(dest))
 
 	cols, _ := rows.Columns()
 	var fields []string
@@ -47,12 +51,12 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 		fields = append(fields, covertColumnName(c))
 	}
 
+	et := t.Elem()
+	if et.Kind() == reflect.Ptr {
+		et = et.Elem()
+	}
+
 	for rows.Next() {
-		et := t.Elem()
-		if et.Kind() == reflect.Ptr {
-			et = et.Elem()
-		}
-		fmt.Println(et.String())
 		ev := reflect.New(et)
 
 		pointers := make([]interface{}, len(cols))
@@ -62,7 +66,6 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 			if !fv.IsValid() {
 				return errors.New(fmt.Sprintf("fv %s not valid", col))
 			}
-			fmt.Println(fv.String())
 			pointers[i] = fv.Addr().Interface()
 		}
 
@@ -70,15 +73,12 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(ev.String())
-		fmt.Println(ev.Elem().String())
 		if t.Elem().Kind() != reflect.Ptr {
 			ev = ev.Elem()
 		}
-		v = reflect.Append(v, ev)
+		v.Set(reflect.Append(v, ev))
 	}
 
-	fmt.Printf("%v", v.Interface())
 	return nil
 }
 
