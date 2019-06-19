@@ -49,24 +49,36 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 
 	for rows.Next() {
 		et := t.Elem()
+		if et.Kind() == reflect.Ptr {
+			et = et.Elem()
+		}
+		fmt.Println(et.String())
 		ev := reflect.New(et)
 
 		pointers := make([]interface{}, len(cols))
 		for i, col := range cols {
 			fieldName := fields[i]
-			field := ev.FieldByName(fieldName)
-			if !field.IsValid() {
-				return errors.New(fmt.Sprintf("field %s not valid", col))
+			fv := ev.Elem().FieldByName(fieldName)
+			if !fv.IsValid() {
+				return errors.New(fmt.Sprintf("fv %s not valid", col))
 			}
-			pointers[i] = field.Addr().Interface()
-			err := rows.Scan(pointers...)
-			if err != nil {
-				return err
-			}
+			fmt.Println(fv.String())
+			pointers[i] = fv.Addr().Interface()
 		}
-		reflect.Append(v, ev)
+
+		err := rows.Scan(pointers...)
+		if err != nil {
+			return err
+		}
+		fmt.Println(ev.String())
+		fmt.Println(ev.Elem().String())
+		if t.Elem().Kind() != reflect.Ptr {
+			ev = ev.Elem()
+		}
+		v = reflect.Append(v, ev)
 	}
 
+	fmt.Printf("%v", v.Interface())
 	return nil
 }
 
