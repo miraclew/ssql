@@ -1,5 +1,7 @@
 # ssql
-ssql provide some simple methods to make it easier to work with SQL in GO.
+ssql package provide some simple methods to make it easier to work with SQL in GO.
+
+ssql is not a full featured ORM library, it's a simple wrapper of standard database/sql package
 
 ## Example 
 
@@ -18,7 +20,7 @@ err := db.Select("select * from items where id=?", 50).Value(&item)
 ### Select rows
 ```go
 var items []Item
-err := db.Select("select * from items where id=?", 50).Values(&items)
+err := db.Select("select * from items").Values(&items)
 ``` 
 
 ### Select scalar value
