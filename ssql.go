@@ -12,11 +12,11 @@ func Open(driverName, dataSourceName string) (*DB, error) {
 }
 
 type DB struct {
-	RawDB *sql.DB
+	*sql.DB
 }
 
 func (db *DB) Select(query string, args ...interface{}) *SelectResult {
-	rows, err := db.RawDB.Query(query, args...)
+	rows, err := db.Query(query, args...)
 	return &SelectResult{rows, err}
 }
 
