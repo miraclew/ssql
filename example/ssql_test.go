@@ -16,9 +16,18 @@ func getDB() *ssql.DB {
 	return db
 }
 
-func TestCount(t *testing.T) {
+func TestInt(t *testing.T) {
 	db := getDB()
 	v, err := db.Select("select count(*) from items where title=?", "华为鸿蒙之外还有后手？极光系统是什么").Int()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(v)
+}
+
+func TestString(t *testing.T) {
+	db := getDB()
+	v, err := db.Select("select title from items where id=?", 50).String()
 	if err != nil {
 		t.Fatal(err)
 	}

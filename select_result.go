@@ -53,3 +53,16 @@ func (r *SelectResult) Bool() (bool, error) {
 	v, err := r.Int()
 	return v > 0, err
 }
+
+func (r *SelectResult) String() (string, error) {
+	if !r.Next() {
+		return "", sql.ErrNoRows
+	}
+
+	var v string
+	err := r.Rows.Scan(&v)
+	if err != nil {
+		return "", err
+	}
+	return v, r.Rows.Close()
+}
