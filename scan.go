@@ -60,13 +60,15 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 		ev := reflect.New(et)
 
 		pointers := make([]interface{}, len(cols))
-		for i, col := range cols {
+		for i := range cols {
 			fieldName := fields[i]
 			fv := ev.Elem().FieldByName(fieldName)
-			if !fv.IsValid() {
-				return errors.New(fmt.Sprintf("fv %s not valid", col))
+			if fv.IsValid() {
+				pointers[i] = fv.Addr().Interface()
+			} else {
+				var df dummyField
+				pointers[i] = &df
 			}
-			pointers[i] = fv.Addr().Interface()
 		}
 
 		err := rows.Scan(pointers...)
@@ -81,6 +83,15 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 
 	return nil
 }
+
+// for fields that exists in DB table, but not exists in struct
+type dummyField struct{}
+
+// Scan implements the Scanner interface.
+func (nt *dummyField) Scan(value interface{}) error {
+	return nil
+}
+
 
 func covertColumnName(column string) string {
 	  s := strings.Replace(column, "_", " ", -1)
