@@ -23,5 +23,5 @@ err := db.Select("select * from items where id=?", 50).Values(&items)
 
 ### Select scalar value
 ```go
-v, err := db.Select("select count(*) from items where id=?", 50).Int()
+v, err := db.Select("select count(*) from items").Int()
 ``` 
