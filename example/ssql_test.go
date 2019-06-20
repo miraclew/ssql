@@ -36,6 +36,17 @@ func TestString(t *testing.T) {
 
 func TestScan(t *testing.T) {
 	db := getDB()
+	var it item
+	err := db.Select("select * from items where id=?", 50).Value(&it)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(it)
+}
+
+
+func TestSliceScan(t *testing.T) {
+	db := getDB()
 	var items []item
 	err := db.Select("select * from items").Values(&items)
 	if err != nil {

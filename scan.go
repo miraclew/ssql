@@ -3,7 +3,6 @@ package ssql
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -25,10 +24,12 @@ func scanStruct(rows *sql.Rows, dest interface{}) error {
 	for i, col := range cols {
 		fieldName := covertColumnName(col)
 		field := v.FieldByName(fieldName)
-		if !field.IsValid() {
-			return errors.New(fmt.Sprintf("field %s not valid", col))
+		if field.IsValid() {
+			pointers[i] = field.Addr().Interface()
+		} else {
+			var df dummyField
+			pointers[i] = &df
 		}
-		pointers[i] = field.Addr().Interface()
 	}
 
 	return rows.Scan(pointers...)
@@ -58,7 +59,6 @@ func scanStructSlice(rows *sql.Rows, dest interface{}) error {
 
 	for rows.Next() {
 		ev := reflect.New(et)
-
 		pointers := make([]interface{}, len(cols))
 		for i := range cols {
 			fieldName := fields[i]
