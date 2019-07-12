@@ -8,6 +8,9 @@ type SelectResult struct {
 }
 
 func (r *SelectResult) Value(v interface{}) error {
+	if r.error != nil {
+		return r.error
+	}
 	err := scanStruct(r.Rows, v)
 	if err != nil {
 		return err
@@ -16,6 +19,9 @@ func (r *SelectResult) Value(v interface{}) error {
 }
 
 func (r *SelectResult) Values(v interface{}) error {
+	if r.error != nil {
+		return r.error
+	}
 	err := scanStructSlice(r.Rows, v)
 	if err != nil {
 		return err
@@ -24,6 +30,9 @@ func (r *SelectResult) Values(v interface{}) error {
 }
 
 func (r *SelectResult) Int64() (int64, error) {
+	if r.error != nil {
+		return 0, r.error
+	}
 	if !r.Next() {
 		return 0, sql.ErrNoRows
 	}
@@ -37,6 +46,9 @@ func (r *SelectResult) Int64() (int64, error) {
 }
 
 func (r *SelectResult) Int() (int, error) {
+	if r.error != nil {
+		return 0, r.error
+	}
 	if !r.Next() {
 		return 0, sql.ErrNoRows
 	}
@@ -55,6 +67,9 @@ func (r *SelectResult) Bool() (bool, error) {
 }
 
 func (r *SelectResult) String() (string, error) {
+	if r.error != nil {
+		return "", r.error
+	}
 	if !r.Next() {
 		return "", sql.ErrNoRows
 	}
